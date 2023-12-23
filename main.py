@@ -10,11 +10,18 @@ if vidcap.isOpened():
     ret, frame = vidcap.read()  #capture a frame from live video
 
     # define the contrast and brightness value
-    contrast = 0.7 # Contrast control
-    brightness = 10 # Brightness control 
+    contrast = 0.5 # Contrast control
+    brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
-    lower = np.array([180,0,0])
-    upper = np.array([200,255,255])
+    lower = np.array([80,40,40])
+    upper = np.array([100,255,255])
+
+    # mu = np.array([235, 212, 50])
+    # delta = np.array([20, 20, 20])
+
+    # lower = mu-delta
+    # upper = mu+delta
+
             
 
     #check whether frame is successfully captured
@@ -24,16 +31,16 @@ if vidcap.isOpened():
             ret, frame = vidcap.read()  #capture a frame from live video
             
             # Adjust frame
-            # frame = cv2.addWeighted(frame, contrast, frame, 0, brightness)  
+            frame = cv2.addWeighted(frame, contrast, frame, 0, brightness)  
             
             # Find blue   
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             color_mask = cv2.inRange(hsv, lower, upper)
-            
-            frame_slice = frame[:, :, 0]
-            masked = np.where(color_mask == 255, color_mask, frame_slice)
+            # color_mask = cv2.inRange(frame, lower, upper)
+
             # print(color_mask)
-            cv2.imshow("Frame",masked)
+            cv2.imshow("Frame", color_mask)
+            cv2.imshow("Frame2", frame)
             # cv2.imshow("Frame", frame)
                
             if np.any(color_mask == 255) == True:
