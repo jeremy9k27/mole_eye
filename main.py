@@ -3,7 +3,9 @@ import numpy as np
 
 
 #Create an object to hold reference to camera video capturing
-vidcap = cv2.VideoCapture(0)
+url = 'http://192.168.0.16:4747/video'
+
+vidcap = cv2.VideoCapture(url)
 
 #check if connection with camera is successfully
 if vidcap.isOpened():
@@ -58,3 +60,7 @@ if vidcap.isOpened():
 # print error if the connection with camera is unsuccessful
 else:
     print("Cannot open camera")
+
+vidcap.release()
+
+cv2.destroyAllWindows()
