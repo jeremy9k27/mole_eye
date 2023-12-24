@@ -16,8 +16,8 @@ if vidcap.isOpened():
     contrast = 0.6 # Contrast control
     brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
-    lower = np.array([80,30,30])
-    upper = np.array([100,255,255])
+    lower = np.array([85,30,30])
+    upper = np.array([95,255,255])
 
     # mu = np.array([235, 212, 50])
     # delta = np.array([20, 20, 20])
