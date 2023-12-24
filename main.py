@@ -3,19 +3,20 @@ import numpy as np
 
 
 #Create an object to hold reference to camera video capturing
-url = 'http://192.168.0.16:4747/video'
+camera = 'http://192.168.0.17:4747/video'
+#camera = 2
 
-vidcap = cv2.VideoCapture(url)
+vidcap = cv2.VideoCapture(camera)
 
 #check if connection with camera is successfully
 if vidcap.isOpened():
     ret, frame = vidcap.read()  #capture a frame from live video
 
     # define the contrast and brightness value
-    contrast = 0.5 # Contrast control
+    contrast = 0.6 # Contrast control
     brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
-    lower = np.array([80,40,40])
+    lower = np.array([80,30,30])
     upper = np.array([100,255,255])
 
     # mu = np.array([235, 212, 50])
@@ -38,13 +39,14 @@ if vidcap.isOpened():
             # Find blue   
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             color_mask = cv2.inRange(hsv, lower, upper)
-            # color_mask = cv2.inRange(frame, lower, upper)
+            # Bitwise-AND mask and original image
+            frame_masked = cv2.bitwise_and(frame,frame, mask= color_mask)
 
-            # print(color_mask)
-            cv2.imshow("Frame", color_mask)
+
+            # cv2.imshow("Frame", color_mask)
             cv2.imshow("Frame2", frame)
-            # cv2.imshow("Frame", frame)
-               
+            cv2.imshow("Masked", frame_masked)
+
             if np.any(color_mask == 255) == True:
                 print("detected")
             else:
