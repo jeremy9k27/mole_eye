@@ -3,8 +3,8 @@ import numpy as np
 
 
 #Create an object to hold reference to camera video capturing
-camera = 'http://192.168.0.17:4747/video'
-#camera = 2
+# camera = 'http://192.168.0.17:4747/video'
+camera = 0
 
 vidcap = cv2.VideoCapture(camera)
 
@@ -16,8 +16,8 @@ if vidcap.isOpened():
     contrast = 0.6 # Contrast control
     brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
-    lower = np.array([85,30,30])
-    upper = np.array([95,255,255])
+    lower = np.array([85-10,30,30])
+    upper = np.array([95+10,255,255])
 
     # mu = np.array([235, 212, 50])
     # delta = np.array([20, 20, 20])
@@ -25,7 +25,8 @@ if vidcap.isOpened():
     # lower = mu-delta
     # upper = mu+delta
 
-            
+    i = 0
+    #halluncinations = np.zeros            
 
     #check whether frame is successfully captured
     if ret:
@@ -39,18 +40,49 @@ if vidcap.isOpened():
             # Find blue   
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             color_mask = cv2.inRange(hsv, lower, upper)
+
             # Bitwise-AND mask and original image
-            frame_masked = cv2.bitwise_and(frame,frame, mask= color_mask)
+            frame_masked = cv2.bitwise_and(hsv,hsv, mask= color_mask)
+            #cv2.imshow("frame masked", cv2.cvtColor(frame_masked, cv2.COLOR_HSV2BGR))
+
+            # frame_masked = cv2.cvtColor(frame_masked, cv2.COLOR_BGR2GRAY)
+            # print(frame_masked.mean())
+            frame_masked_gray = (np.floor_divide(frame_masked[:, :, 1], 2)) + (np.floor_divide(frame_masked[:,:,2] ,2 ))
+            # print(frame_masked_gray.max())
+
+            
+            #find hallucinations   
+            if i == 0:
+                hallucinations = np.zeros_like(color_mask)
+                
+            
+            if i < 50:
+                hallucinations = np.logical_or(hallucinations, color_mask).astype(int)
+                i += 1    
+           
+            
 
 
-            # cv2.imshow("Frame", color_mask)
+            # calculate moments of binary image
+            frame_masked_gray[hallucinations == 1] = 0
+            M = cv2.moments(frame_masked_gray)
+
+
+                       # calculate x,y coordinate of center
+            if (M["m00"] > 255 * 0.1):
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+                #print(cX, cY)
+                cv2.circle(frame, (cX, cY), 5, 255, -1)
+
+
             cv2.imshow("Frame2", frame)
-            cv2.imshow("Masked", frame_masked)
+            cv2.imshow("frame_masked_gray", frame_masked_gray)
 
-            if np.any(color_mask == 255) == True:
-                print("detected")
-            else:
-                print("none")
+            # if np.any(color_mask == 255) == True:
+            #     print("detected")
+            # else:
+            #     print("none")
 
             #press 'q' to break out of the loop
             if cv2.waitKey(1) & 0xFF == ord('q'):
