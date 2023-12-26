@@ -3,8 +3,8 @@ import numpy as np
 
 
 #Create an object to hold reference to camera video capturing
-# camera = 'http://192.168.0.17:4747/video'
-camera = 0
+camera = 'http://192.168.0.16:4747/video'
+#camera = 0
 
 vidcap = cv2.VideoCapture(camera)
 
@@ -16,8 +16,8 @@ if vidcap.isOpened():
     contrast = 0.6 # Contrast control
     brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
-    lower = np.array([85-10,30,30])
-    upper = np.array([95+10,255,255])
+    lower = np.array([80,30,30])
+    upper = np.array([100,255,255])
 
     # mu = np.array([235, 212, 50])
     # delta = np.array([20, 20, 20])
@@ -33,6 +33,8 @@ if vidcap.isOpened():
         # continue to display window until 'q' is pressed
         while(True):
             ret, frame = vidcap.read()  #capture a frame from live video
+            if i == 0:
+                print(frame.shape)
             
             # Adjust frame
             frame = cv2.addWeighted(frame, contrast, frame, 0, brightness)  
@@ -56,20 +58,24 @@ if vidcap.isOpened():
                 hallucinations = np.zeros_like(color_mask)
                 
             
-            if i < 50:
+            if i < 700:
                 hallucinations = np.logical_or(hallucinations, color_mask).astype(int)
-                i += 1    
+                i += 1 
+                print(i)
+
+
+            if i == 700:
+                print("ready") 
+                print(color_mask.shape)
+                i += 1  
            
-            
-
-
             # calculate moments of binary image
             frame_masked_gray[hallucinations == 1] = 0
             M = cv2.moments(frame_masked_gray)
 
 
                        # calculate x,y coordinate of center
-            if (M["m00"] > 255 * 0.1):
+            if (M["m00"] > 0):
                 cX = int(M["m10"] / M["m00"])
                 cY = int(M["m01"] / M["m00"])
                 #print(cX, cY)
