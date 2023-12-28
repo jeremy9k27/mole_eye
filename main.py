@@ -3,8 +3,8 @@ import numpy as np
 
 
 #Create an object to hold reference to camera video capturing
-camera = 'http://192.168.0.16:4747/video'
-#camera = 0
+#camera = 'http://192.168.0.16:4747/video'
+camera = 0
 
 vidcap = cv2.VideoCapture(camera)
 
@@ -26,6 +26,7 @@ if vidcap.isOpened():
     # upper = mu+delta
 
     i = 0
+
     #halluncinations = np.zeros            
 
     #check whether frame is successfully captured
@@ -33,8 +34,7 @@ if vidcap.isOpened():
         # continue to display window until 'q' is pressed
         while(True):
             ret, frame = vidcap.read()  #capture a frame from live video
-            if i == 0:
-                print(frame.shape)
+                     
             
             # Adjust frame
             frame = cv2.addWeighted(frame, contrast, frame, 0, brightness)  
@@ -56,30 +56,54 @@ if vidcap.isOpened():
             #find hallucinations   
             if i == 0:
                 hallucinations = np.zeros_like(color_mask)
+                #num_rows = frame.shape[0]
+                #num_cols = frame.shape[1]
+                black_frame = np.zeros_like(color_mask)
                 
             
-            if i < 1000:
+            if i < 100:
                 hallucinations = np.logical_or(hallucinations, color_mask).astype(int)
                 i += 1 
                 print(i)
 
 
-            if i == 1000:
+            if i == 100:
                 print("initialized") 
-                print(color_mask.shape)
+                #print(color_mask.shape)
                 i += 1  
            
             # calculate moments of binary image
+            color_mask[hallucinations == 1] = 0
             frame_masked_gray[hallucinations == 1] = 0
             M = cv2.moments(frame_masked_gray)
 
 
-                       # calculate x,y coordinate of center
+            # calculate x,y coordinate of center
             if (M["m00"] > 0):
                 cX = int(M["m10"] / M["m00"])
                 cY = int(M["m01"] / M["m00"])
-                #print(cX, cY)
-                cv2.circle(frame, (cX, cY), 5, 255, -1)
+
+                '''#find distances to centroid
+                for row in range(num_rows):
+                    for col in range(num_cols):
+                        if color_mask[row,col] == 1:
+                            distance = 5
+                            if distance > 10:
+                                frame_masked_gray[row, col] = 0
+                '''
+
+                frame_circle_only = cv2.circle(black_frame, (cX, cY), 10, 0, -1)
+                frame_masked_gray[frame_circle_only == 0] = 0
+
+
+                #recompute centroid
+                M = cv2.moments(frame_masked_gray)
+                if (M["m00"] > 0):
+                    cX = int(M["m10"] / M["m00"])
+                    cY = int(M["m01"] / M["m00"])
+
+                    #print(cX, cY)
+                    cv2.circle(frame, (cX, cY), 5, 255, -1)
                 
 
 
