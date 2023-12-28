@@ -16,8 +16,8 @@ if vidcap.isOpened():
     contrast = 0.6 # Contrast control
     brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
-    lower = np.array([80,30,30])
-    upper = np.array([100,255,255])
+    lower = np.array([40,30,30])
+    upper = np.array([60,255,255])
 
     # mu = np.array([235, 212, 50])
     # delta = np.array([20, 20, 20])
@@ -58,14 +58,14 @@ if vidcap.isOpened():
                 hallucinations = np.zeros_like(color_mask)
                 
             
-            if i < 700:
+            if i < 1000:
                 hallucinations = np.logical_or(hallucinations, color_mask).astype(int)
                 i += 1 
                 print(i)
 
 
-            if i == 700:
-                print("ready") 
+            if i == 1000:
+                print("initialized") 
                 print(color_mask.shape)
                 i += 1  
            
@@ -80,10 +80,12 @@ if vidcap.isOpened():
                 cY = int(M["m01"] / M["m00"])
                 #print(cX, cY)
                 cv2.circle(frame, (cX, cY), 5, 255, -1)
+                
 
 
             cv2.imshow("Frame2", frame)
             cv2.imshow("frame_masked_gray", frame_masked_gray)
+            #cv2.imshow("frame masked", cv2.cvtColor(frame_masked, cv2.COLOR_HSV2BGR))
 
             # if np.any(color_mask == 255) == True:
             #     print("detected")
