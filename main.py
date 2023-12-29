@@ -117,11 +117,11 @@ if vidcap.isOpened():
                     
                 
                 if k < 3:
-                    centroid_array[k][0] = cX
-                    centroid_array[k][1] = cY
+                    centroid_array[0][k] = cX
+                    centroid_array[1][k] = cY
                     k += 1
 
-                close = (abs(centroid_array[0][-3] - centroid_array[0][-2]) < 5) & (abs(centroid_array[0][-2] - centroid_array[0][-1]) < 5) & (abs(centroid_array[1][-1] - centroid_array[1][-2]) < 5) & (abs(centroid_array[1][-2] - centroid_array[1][-3]) < 5)
+                close = (abs(centroid_array[0][-3] - centroid_array[0][-2]) < 3) & (abs(centroid_array[0][-2] - centroid_array[0][-1]) < 3) & (abs(centroid_array[1][-1] - centroid_array[1][-2]) < 3) & (abs(centroid_array[1][-2] - centroid_array[1][-3]) < 3)
                 
                 if not start:
                     if close:
@@ -132,7 +132,7 @@ if vidcap.isOpened():
                     if not close:
                         stop = True
 
-                new_col = np.array([cX, cY])
+                new_col = np.array([[cX], [cY]])
                 centroid_array = np.hstack((centroid_array, new_col))
                                    
                 if not start:
@@ -143,7 +143,7 @@ if vidcap.isOpened():
                     #do math
 
 
-                    centroid_array = np.zeros(3,2)
+                    centroid_array = np.zeros((2,3))
                     start = False
                     stop = False
                     k = 0
