@@ -67,13 +67,13 @@ if vidcap.isOpened():
                 
                 
             
-            if i < 100:
+            if i < 1000:
                 hallucinations = np.logical_or(hallucinations, color_mask).astype(int)
                 i += 1 
                 print(i)
                 
 
-            if i == 100:
+            if i == 1000:
                 print("initialized") 
                 #print(color_mask.shape)
                 i += 1  
@@ -121,20 +121,23 @@ if vidcap.isOpened():
                     centroid_array[1][k] = cY
                     k += 1
 
-                close = (abs(centroid_array[0][-3] - centroid_array[0][-2]) < 3) & (abs(centroid_array[0][-2] - centroid_array[0][-1]) < 3) & (abs(centroid_array[1][-1] - centroid_array[1][-2]) < 3) & (abs(centroid_array[1][-2] - centroid_array[1][-3]) < 3)
+                new_col = np.array([[cX], [cY]])
+                centroid_array = np.hstack((centroid_array, new_col))
+
                 
+                start_con = (abs(centroid_array[0][-3] - centroid_array[0][-2]) < 3) & (abs(centroid_array[0][-2] - centroid_array[0][-1]) < 3) & (abs(centroid_array[1][-1] - centroid_array[1][-2]) < 3) & (abs(centroid_array[1][-2] - centroid_array[1][-3]) < 3)
+                stop_con = (abs(centroid_array[0][-3] - centroid_array[0][-2]) > 3) & (abs(centroid_array[0][-2] - centroid_array[0][-1]) > 3) & (abs(centroid_array[0][-1] - centroid_array[0][-3]) > 3) & (abs(centroid_array[1][-1] - centroid_array[1][-2]) > 3) & (abs(centroid_array[1][-2] - centroid_array[1][-3]) > 3) & (abs(centroid_array[1][-1] - centroid_array[1][-3]) > 3)
+
                 if not start:
-                    if close:
+                    if start_con:
                         start = True
                         print("started")
 
                 if start:
-                    if not close:
+                    if stop_con:
                         stop = True
 
-                new_col = np.array([[cX], [cY]])
-                centroid_array = np.hstack((centroid_array, new_col))
-                                   
+                                                   
                 if not start:
                    centroid_array = centroid_array[: , 1:]
                 
@@ -147,6 +150,7 @@ if vidcap.isOpened():
                     start = False
                     stop = False
                     k = 0
+                    break
 
 
             cv2.imshow("Frame2", frame)
