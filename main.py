@@ -3,7 +3,7 @@ import numpy as np
 
 
 #Create an object to hold reference to camera video capturing
-camera = 'http://192.168.0.19:4747/video'
+camera = 'http://192.168.0.16:4747/video'
 #camera = 0
 
 vidcap = cv2.VideoCapture(camera)
@@ -26,7 +26,9 @@ if vidcap.isOpened():
     # upper = mu+delta
 
     #i = 0
-
+    i = 0
+    k = 0
+            
     #halluncinations = np.zeros            
 
     #check whether frame is successfully captured
@@ -54,25 +56,24 @@ if vidcap.isOpened():
 
             
             #find hallucinations   
-            i = 0
             
             if i == 0:
                 hallucinations = np.zeros_like(color_mask)
                 #num_rows = frame.shape[0]
                 #num_cols = frame.shape[1]
-                centroid_array = np.zeros(3,2)
+                centroid_array = np.zeros((2,3))
                 start = False
                 stop = False
                 
                 
             
-            if i < 2000:
+            if i < 100:
                 hallucinations = np.logical_or(hallucinations, color_mask).astype(int)
                 i += 1 
                 print(i)
                 
 
-            if i == 2000:
+            if i == 100:
                 print("initialized") 
                 #print(color_mask.shape)
                 i += 1  
@@ -115,27 +116,37 @@ if vidcap.isOpened():
                 #cv2.circle(frame, (cX, cY), 5, 255, -1)
                     
                 
-                for k in range(3):
-                    fill centroid array
+                if k < 3:
+                    centroid_array[k][0] = cX
+                    centroid_array[k][1] = cY
+                    k += 1
 
-                if start == False:
-                    if trigger:
+                close = (abs(centroid_array[0][-3] - centroid_array[0][-2]) < 5) & (abs(centroid_array[0][-2] - centroid_array[0][-1]) < 5) & (abs(centroid_array[1][-1] - centroid_array[1][-2]) < 5) & (abs(centroid_array[1][-2] - centroid_array[1][-3]) < 5)
+                
+                if not start:
+                    if close:
                         start = True
+                        print("started")
 
-                if start == True:
-                    if trigger2:
+                if start:
+                    if not close:
                         stop = True
 
+                new_col = np.array([cX, cY])
+                centroid_array = np.hstack((centroid_array, new_col))
+                                   
                 if not start:
-                    rewrite 3x2
+                   centroid_array = centroid_array[: , 1:]
                 
-                if start:
-                    append into nx2
-
                 if stop:
+                    print(centroid_array)
+                    #do math
+
+
                     centroid_array = np.zeros(3,2)
                     start = False
                     stop = False
+                    k = 0
 
 
             cv2.imshow("Frame2", frame)
