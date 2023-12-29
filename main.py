@@ -3,8 +3,8 @@ import numpy as np
 
 
 #Create an object to hold reference to camera video capturing
-#camera = 'http://192.168.0.16:4747/video'
-camera = 0
+camera = 'http://192.168.0.19:4747/video'
+#camera = 0
 
 vidcap = cv2.VideoCapture(camera)
 
@@ -16,8 +16,8 @@ if vidcap.isOpened():
     contrast = 0.6 # Contrast control
     brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
-    lower = np.array([40,30,30])
-    upper = np.array([60,255,255])
+    lower = np.array([35,30,30])
+    upper = np.array([65,255,255])
 
     # mu = np.array([235, 212, 50])
     # delta = np.array([20, 20, 20])
@@ -25,7 +25,7 @@ if vidcap.isOpened():
     # lower = mu-delta
     # upper = mu+delta
 
-    i = 0
+    #i = 0
 
     #halluncinations = np.zeros            
 
@@ -54,20 +54,25 @@ if vidcap.isOpened():
 
             
             #find hallucinations   
+            i = 0
+            
             if i == 0:
                 hallucinations = np.zeros_like(color_mask)
                 #num_rows = frame.shape[0]
                 #num_cols = frame.shape[1]
-                black_frame = np.zeros_like(color_mask)
+                centroid_array = np.zeros(3,2)
+                start = False
+                stop = False
+                
                 
             
-            if i < 100:
+            if i < 2000:
                 hallucinations = np.logical_or(hallucinations, color_mask).astype(int)
                 i += 1 
                 print(i)
+                
 
-
-            if i == 100:
+            if i == 2000:
                 print("initialized") 
                 #print(color_mask.shape)
                 i += 1  
@@ -92,10 +97,12 @@ if vidcap.isOpened():
                                 frame_masked_gray[row, col] = 0
                 '''
 
-                frame_circle_only = cv2.circle(black_frame, (cX, cY), 10, 0, -1)
-                frame_masked_gray[frame_circle_only == 0] = 0
+                black_frame = np.zeros_like(color_mask)
+                cv2.circle(black_frame, (cX, cY), 40, 255, -1)
+                frame_masked_gray[black_frame == 0] = 0
+                #cv2.imshow("black", black_frame)
 
-
+                
                 #recompute centroid
                 M = cv2.moments(frame_masked_gray)
                 if (M["m00"] > 0):
@@ -105,6 +112,30 @@ if vidcap.isOpened():
                     #print(cX, cY)
                     cv2.circle(frame, (cX, cY), 5, 255, -1)
                 
+                #cv2.circle(frame, (cX, cY), 5, 255, -1)
+                    
+                
+                for k in range(3):
+                    fill centroid array
+
+                if start == False:
+                    if trigger:
+                        start = True
+
+                if start == True:
+                    if trigger2:
+                        stop = True
+
+                if not start:
+                    rewrite 3x2
+                
+                if start:
+                    append into nx2
+
+                if stop:
+                    centroid_array = np.zeros(3,2)
+                    start = False
+                    stop = False
 
 
             cv2.imshow("Frame2", frame)
