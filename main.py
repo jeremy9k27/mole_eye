@@ -3,11 +3,13 @@ import numpy as np
 
 def disp_pitch(pitch_array, original):
     #print("successful")
-    black = np.array((480,640))
-    onto = original    
-    for i in range(pitch_array.shape[1]):
-        print((pitch_array[0][i], pitch_array[1][i]))
-        cv2.circle(black, (pitch_array[0][i], pitch_array[1][i]), 5, 255, -1)
+    #black = np.zeros((480,640))
+    onto = original
+    
+    for i in range(pitch_array.shape[1]-1):
+        center = (pitch_array[0][i].astype(int), pitch_array[1][i].astype(int))
+        #print(center)
+        cv2.circle(onto, center, 5, 255, -1)
 
     while True:
         cv2.imshow("pitch map", onto)
