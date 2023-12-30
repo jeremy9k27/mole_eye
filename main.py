@@ -1,9 +1,20 @@
 import cv2   #include opencv library functions in python
 import numpy as np
 
+def disp_pitch(pitch_array):
+    black = np.zeros((640,480))
+    for i in range(pitch_array.shape[1]):
+        cv2.circle(black, (pitch_array[0][i], pitch_array[1][i]), 5, 255, -1)
 
+    while True:
+        cv2.imshow("pitch map", black)
+
+        if cv2.waitKey(1) & 0xFF == ord('p'):
+                break
+        
+        
 #Create an object to hold reference to camera video capturing
-camera = 'http://192.168.0.16:4747/video'
+camera = 'http://192.168.0.14:4747/video'
 #camera = 0
 
 vidcap = cv2.VideoCapture(camera)
@@ -16,8 +27,8 @@ if vidcap.isOpened():
     contrast = 0.6 # Contrast control
     brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
-    lower = np.array([35,30,30])
-    upper = np.array([65,255,255])
+    lower = np.array([32,30,30])
+    upper = np.array([68,255,255])
 
     # mu = np.array([235, 212, 50])
     # delta = np.array([20, 20, 20])
@@ -56,7 +67,7 @@ if vidcap.isOpened():
 
             
             #find hallucinations   
-            
+            ''''''
             if i == 0:
                 hallucinations = np.zeros_like(color_mask)
                 #num_rows = frame.shape[0]
@@ -67,20 +78,28 @@ if vidcap.isOpened():
                 
                 
             
-            if i < 1000:
+            if i < 600:
                 hallucinations = np.logical_or(hallucinations, color_mask).astype(int)
+                
                 i += 1 
-                print(i)
+                if i in [100,200,300,400,500,600,700,800,900,1000]:
+                    print(i)
                 
 
-            if i == 1000:
-                print("initialized") 
+            if i == 600:
+                #hallucinations = cv2.blur(hallucinations,(5,5))  
+                #hallucinations[hallucinations > 0] = 1
+                
+                print("initialized")
+                
                 #print(color_mask.shape)
                 i += 1  
+
+            #cv2.imshow("hallucinations", 255 * hallucinations.astype(np.uint8))
            
             # calculate moments of binary image
-            color_mask[hallucinations == 1] = 0
-            frame_masked_gray[hallucinations == 1] = 0
+            color_mask[hallucinations > 0] = 0
+            frame_masked_gray[hallucinations > 0] = 0
             M = cv2.moments(frame_masked_gray)
 
 
@@ -121,36 +140,45 @@ if vidcap.isOpened():
                     centroid_array[1][k] = cY
                     k += 1
 
-                new_col = np.array([[cX], [cY]])
-                centroid_array = np.hstack((centroid_array, new_col))
+                else:
+                    
+                    start_con =  (centroid_array[1][-1] < 205) & (((abs(centroid_array[0][-3] - centroid_array[0][-2])) + (abs(centroid_array[1][-3] - centroid_array[1][-2])) < 10) & ((abs(centroid_array[0][-2] - centroid_array[0][-1])) + (abs(centroid_array[1][-2] - centroid_array[1][-1])) < 10))
+                    stop_con = ((abs(centroid_array[0][-3] - centroid_array[0][-2])) + (abs(centroid_array[1][-3] - centroid_array[1][-2])) > 15) & ((abs(centroid_array[0][-2] - centroid_array[0][-1])) + (abs(centroid_array[1][-2] - centroid_array[1][-1])) > 15) & ((abs(centroid_array[0][-3] - centroid_array[0][-1])) + (abs(centroid_array[1][-3] - centroid_array[1][-1])) > 15)
 
-                
-                start_con = (abs(centroid_array[0][-3] - centroid_array[0][-2]) < 3) & (abs(centroid_array[0][-2] - centroid_array[0][-1]) < 3) & (abs(centroid_array[1][-1] - centroid_array[1][-2]) < 3) & (abs(centroid_array[1][-2] - centroid_array[1][-3]) < 3)
-                stop_con = (abs(centroid_array[0][-3] - centroid_array[0][-2]) > 3) & (abs(centroid_array[0][-2] - centroid_array[0][-1]) > 3) & (abs(centroid_array[0][-1] - centroid_array[0][-3]) > 3) & (abs(centroid_array[1][-1] - centroid_array[1][-2]) > 3) & (abs(centroid_array[1][-2] - centroid_array[1][-3]) > 3) & (abs(centroid_array[1][-1] - centroid_array[1][-3]) > 3)
+                    new_col = np.array([[cX], [cY]])
+                    centroid_array = np.hstack((centroid_array, new_col))
 
-                if not start:
-                    if start_con:
-                        start = True
-                        print("started")
+                    if not start:
+                        if start_con:
+                            start = True
+                            print("potential pitch detected")
 
-                if start:
-                    if stop_con:
-                        stop = True
+                    if start:
+                        if stop_con:
+                            stop = True
 
-                                                   
-                if not start:
-                   centroid_array = centroid_array[: , 1:]
-                
-                if stop:
-                    print(centroid_array)
-                    #do math
+                                                    
+                    if not start:
+                        centroid_array = centroid_array[: , 1:]
+                    
+                    if stop:
+                        if centroid_array.shape[1] > 10:
+                            print("pitch detected")
+                            print(centroid_array[:, :-1])
+                            disp_pitch(centroid_array)
+                            #do math
+                        
+                        else:
+                            print("pitch not detected")
 
 
-                    centroid_array = np.zeros((2,3))
-                    start = False
-                    stop = False
-                    k = 0
-                    break
+                        centroid_array = np.zeros((2,3))
+                        start = False
+                        stop = False
+                        k = 0
+                        #break
+
+
 
 
             cv2.imshow("Frame2", frame)
@@ -176,3 +204,26 @@ else:
 vidcap.release()
 
 cv2.destroyAllWindows()
+
+
+
+
+
+'''
+4seam
+[[451. 446. 441. 439. 436. 433. 432. 428. 427. 425. 304. 422. 423. 467.
+  569.]
+ [173. 177. 180. 184. 187. 190. 194. 199. 201. 204. 221. 210. 214. 207.
+  152.]]
+  
+sweep
+[[419. 418. 411. 411. 407. 401. 402. 400. 398. 397. 395. 397. 352. 279.]
+ [149. 152. 152. 154. 162. 164. 165. 172. 174. 174. 173. 177. 168. 132.]]
+
+
+ sink?
+ [[431. 426. 422. 418. 414. 410. 409. 402. 402. 401. 397. 636. 563.]
+ [ 93.  97. 101. 103. 105. 108. 108. 118. 120. 121. 124. 164. 143.]]
+
+
+'''
