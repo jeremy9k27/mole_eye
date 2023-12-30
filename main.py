@@ -1,13 +1,16 @@
 import cv2   #include opencv library functions in python
 import numpy as np
 
-def disp_pitch(pitch_array):
-    black = np.zeros((640,480))
+def disp_pitch(pitch_array, original):
+    #print("successful")
+    black = np.array((480,640))
+    onto = original    
     for i in range(pitch_array.shape[1]):
+        print((pitch_array[0][i], pitch_array[1][i]))
         cv2.circle(black, (pitch_array[0][i], pitch_array[1][i]), 5, 255, -1)
 
     while True:
-        cv2.imshow("pitch map", black)
+        cv2.imshow("pitch map", onto)
 
         if cv2.waitKey(1) & 0xFF == ord('p'):
                 break
@@ -165,7 +168,7 @@ if vidcap.isOpened():
                         if centroid_array.shape[1] > 10:
                             print("pitch detected")
                             print(centroid_array[:, :-1])
-                            disp_pitch(centroid_array)
+                            disp_pitch(centroid_array, frame)
                             #do math
                         
                         else:
