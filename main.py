@@ -23,7 +23,7 @@ def avg_array(original_array):
 def classify(pitch):
     x = (max(pitch[0][:]) - min(pitch[0]))
     y = (max(pitch[1]) - min(pitch[1]))
-    if x / y < 1.6:
+    if y/x < .7:
         type = "fastball"
     else:
         type = "curveball"
@@ -54,6 +54,7 @@ def disp_pitch(pitch_array, original):
         cv2.imshow("pitch map", onto)
 
         if cv2.waitKey(1) & 0xFF == ord('p'):
+                original = original
                 break
         
 
@@ -91,7 +92,7 @@ if vidcap.isOpened():
     brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
     # center is 50?
-    lower = np.array([32,22,30])
+    lower = np.array([31,22,30])
     upper = np.array([80,255,255])
 
     # mu = np.array([235, 212, 50])
@@ -140,7 +141,7 @@ if vidcap.isOpened():
                 centroid_array = np.zeros((2,3))
                 start = False
                 stop = False
-                onto1 = frame
+                onto1 = frame.copy()
                 
                 
             
@@ -161,7 +162,7 @@ if vidcap.isOpened():
                 #print(color_mask.shape)
                 i += 1  
 
-            cv2.imshow("hallucinations", 255 * hallucinations.astype(np.uint8))
+            #cv2.imshow("hallucinations", 255 * hallucinations.astype(np.uint8))
            
             # calculate moments of binary image
             color_mask[hallucinations > 0] = 0
@@ -196,7 +197,7 @@ if vidcap.isOpened():
                     cY = int(M["m01"] / M["m00"])
 
                     #print(cX, cY)
-                    cv2.circle(frame, (cX, cY), 5, 255, -1)
+                    #cv2.circle(frame, (cX, cY), 5, 255, -1)
                 
                 #cv2.circle(frame, (cX, cY), 5, 255, -1)
                     
@@ -247,6 +248,7 @@ if vidcap.isOpened():
                         start = False
                         stop = False
                         k = 0
+                        onto1 = frame
                         #break
 
 
