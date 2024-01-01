@@ -1,25 +1,83 @@
 import cv2   #include opencv library functions in python
 import numpy as np
 
+def avg_array(original_array):
+    
+    new_array = np.zeros_like(original_array, dtype=float)
+   
+    # Calculate averages based on specified conditions
+    for m in [0,1]:
+        for i in range(original_array.shape[1]):
+            if i == 0:
+                # For the first element, average with the next element
+                new_array[m][i] = (original_array[m][i] + original_array[m][i + 1]) / 2
+            elif i == (original_array.shape[1]) - 1:
+                # For the last element, average with the previous element
+                new_array[m][i] = (original_array[m][i] + original_array[m][i - 1]) / 2
+            else:
+                # For elements in the middle, average with the previous, current, and next elements
+                new_array[m][i] = (original_array[m][i - 1] + original_array[m][i] + original_array[m][i + 1]) / 3
+
+    return new_array.astype(int)
+
+def classify(pitch):
+    x = (max(pitch[0][:]) - min(pitch[0]))
+    y = (max(pitch[1]) - min(pitch[1]))
+    if x / y < 1.6:
+        type = "fastball"
+    else:
+        type = "curveball"
+
+    return [type, np.str_(x), np.str_(y)]
+    
+
 def disp_pitch(pitch_array, original):
     #print("successful")
     #black = np.zeros((480,640))
     onto = original
     
-    for i in range(pitch_array.shape[1]-1):
+    for i in range(pitch_array.shape[1]):
         center = (pitch_array[0][i].astype(int), pitch_array[1][i].astype(int))
         #print(center)
         cv2.circle(onto, center, 5, 255, -1)
 
+    text = classify(pitch_array)
+    
     while True:
+        cv2.putText(onto, text[0], (10, 460), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        cv2.putText(onto, "horiz", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        cv2.putText(onto, text[1], (90, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        cv2.putText(onto, "vert", (10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        cv2.putText(onto, text[2], (90, 430), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+
+    
         cv2.imshow("pitch map", onto)
 
         if cv2.waitKey(1) & 0xFF == ord('p'):
                 break
         
+
+def process(pitch_array):
+    print("before")
+    print(pitch_array)
+    i = 0
+    limit = (pitch_array.shape[1])
+    while i < limit -1:
+        if ((abs(pitch_array[0][i+1] - pitch_array[0][i])) + (abs(pitch_array[1][i+1] - pitch_array[1][i])) < 60):
+            i += 1
+        else:
+            pitch_array = np.delete(pitch_array, i+1, axis=1)
+            limit += -1
+    i = 0
+
+    print("after")
+    pitch_array = avg_array(pitch_array)
+    print(pitch_array)
+    return pitch_array
+        
         
 #Create an object to hold reference to camera video capturing
-camera = 'http://192.168.0.14:4747/video'
+camera = 'http://192.168.0.16:4747/video'
 #camera = 0
 
 vidcap = cv2.VideoCapture(camera)
@@ -32,8 +90,9 @@ if vidcap.isOpened():
     contrast = 0.6 # Contrast control
     brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
-    lower = np.array([32,30,30])
-    upper = np.array([68,255,255])
+    # center is 50?
+    lower = np.array([32,22,30])
+    upper = np.array([80,255,255])
 
     # mu = np.array([235, 212, 50])
     # delta = np.array([20, 20, 20])
@@ -75,11 +134,13 @@ if vidcap.isOpened():
             ''''''
             if i == 0:
                 hallucinations = np.zeros_like(color_mask)
+                print(frame.shape)
                 #num_rows = frame.shape[0]
                 #num_cols = frame.shape[1]
                 centroid_array = np.zeros((2,3))
                 start = False
                 stop = False
+                onto1 = frame
                 
                 
             
@@ -100,7 +161,7 @@ if vidcap.isOpened():
                 #print(color_mask.shape)
                 i += 1  
 
-            #cv2.imshow("hallucinations", 255 * hallucinations.astype(np.uint8))
+            cv2.imshow("hallucinations", 255 * hallucinations.astype(np.uint8))
            
             # calculate moments of binary image
             color_mask[hallucinations > 0] = 0
@@ -147,8 +208,8 @@ if vidcap.isOpened():
 
                 else:
                     
-                    start_con =  (centroid_array[1][-1] < 205) & (((abs(centroid_array[0][-3] - centroid_array[0][-2])) + (abs(centroid_array[1][-3] - centroid_array[1][-2])) < 10) & ((abs(centroid_array[0][-2] - centroid_array[0][-1])) + (abs(centroid_array[1][-2] - centroid_array[1][-1])) < 10))
-                    stop_con = ((abs(centroid_array[0][-3] - centroid_array[0][-2])) + (abs(centroid_array[1][-3] - centroid_array[1][-2])) > 15) & ((abs(centroid_array[0][-2] - centroid_array[0][-1])) + (abs(centroid_array[1][-2] - centroid_array[1][-1])) > 15) & ((abs(centroid_array[0][-3] - centroid_array[0][-1])) + (abs(centroid_array[1][-3] - centroid_array[1][-1])) > 15)
+                    start_con =  (centroid_array[0][0] > 480) & (centroid_array[1][0] < 240) & (centroid_array[0][1] > 480) & (centroid_array[1][1] < 240) & (((abs(centroid_array[0][-3] - centroid_array[0][-2])) + (abs(centroid_array[1][-3] - centroid_array[1][-2])) < 150) & ((abs(centroid_array[0][-2] - centroid_array[0][-1])) + (abs(centroid_array[1][-2] - centroid_array[1][-1])) < 150))
+                    stop_con = ((abs(centroid_array[0][-3] - centroid_array[0][-2])) + (abs(centroid_array[1][-3] - centroid_array[1][-2])) > 60) & ((abs(centroid_array[0][-2] - centroid_array[0][-1])) + (abs(centroid_array[1][-2] - centroid_array[1][-1])) > 60) & ((abs(centroid_array[0][-3] - centroid_array[0][-1])) + (abs(centroid_array[1][-3] - centroid_array[1][-1])) > 60)
 
                     new_col = np.array([[cX], [cY]])
                     centroid_array = np.hstack((centroid_array, new_col))
@@ -169,9 +230,14 @@ if vidcap.isOpened():
                     if stop:
                         if centroid_array.shape[1] > 10:
                             print("pitch detected")
-                            print(centroid_array[:, :-1])
-                            disp_pitch(centroid_array, frame)
-                            #do math
+                            #print(centroid_array[:, :-1])
+
+                            #process centroid array
+                            centroid_array = process(centroid_array)
+                            
+                            #do math and display
+                            disp_pitch(centroid_array, onto1)
+                            
                         
                         else:
                             print("pitch not detected")
