@@ -21,10 +21,18 @@ def avg_array(original_array):
     return new_array.astype(int)
 
 def classify(pitch):
-    x = (max(pitch[0][:]) - min(pitch[0]))
-    y = (max(pitch[1]) - min(pitch[1]))
-    if y/x < .7:
+   
+    # i think the slope of the second half of the pitch is more informative of the pitch type
+    #pitch = pitch[: , 0:int(pitch.shape[1]/2)]
+    x = max(pitch[0]) - min(pitch[0])
+    y = max(pitch[1]) - min(pitch[1])
+    slope = y/x
+    if slope < 0.5:
+        type = "slider (sweeper)"
+    elif slope < 1.1:
         type = "fastball"
+    elif False:
+        type = "slider (gyro)"
     else:
         type = "curveball"
 
@@ -78,7 +86,7 @@ def process(pitch_array):
         
         
 #Create an object to hold reference to camera video capturing
-camera = 'http://192.168.0.16:4747/video'
+camera = 'http://192.168.0.17:4747/video'
 #camera = 0
 
 vidcap = cv2.VideoCapture(camera)
