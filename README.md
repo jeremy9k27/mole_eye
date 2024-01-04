@@ -1,9 +1,9 @@
 # mole_eye
 
-Real-time no-cost baseball pitch classifier
+Real-Time No-Cost Baseball Pitch Classifier
 
 
-Examples Below.
+Examples below.
 A green ping pong ball was used in the examples so that it could safely be thrown indoors.
 
 Fastball:
@@ -15,3 +15,13 @@ Curveball:
 
 https://github.com/jeremy9k27/mole_eye/assets/118779230/3cbc3c86-eb40-4060-b2fe-a48529985c5c
 
+
+
+The algorithm (full code can be found in mole_eye_main), ...
+
+- ball detection based on color
+- computing centroid
+- recomputing centroid
+- defining when a pitch is identified
+- smoothing and classifying
+- next steps
