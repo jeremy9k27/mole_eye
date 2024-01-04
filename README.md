@@ -3,7 +3,7 @@
 Real-time no-cost baseball pitch classifier
 
 
-Examples Below
+Examples Below.
 A green ping pong ball was used in the examples so that it could safely be thrown indoors.
 
 Fastball:
