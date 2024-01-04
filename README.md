@@ -17,7 +17,7 @@ https://github.com/jeremy9k27/mole_eye/assets/118779230/3cbc3c86-eb40-4060-b2fe-
 
 
 
-The algorithm (full code can be found in mole_eye_main), ...
+The algorithm (full code can be found in main_code branch), ...
 
 - ball detection based on color
 - computing centroid
