@@ -28,7 +28,8 @@ One of the biggest obstacles is that even a still video is noisy. That is, even 
 ***Centroid Calculation and Recalculation***
 We seek to represent the ball as a single coordinate in each frame. This is done by finding the weighted centroid of the x coordinates and y coordinates of all the pixels that are within the green range, with the weights being the amount of "greeness" of each pixel. In many of the frames, these pixels include hallucinations that make the resulting Cx and Cy inaccurate. Fortunately, there are more almost always more signal pixels than hallucination pixels, which means innaccurate centroids are still close to the actual ball, allowing us to easily remove the hallucinations. We utilize CV2's circle function for this: we create a circle of radius 10 pixels around the centroid, and any points not inside the circle are removed from the set of pixels inside the green range. This removes almost all hallucinations. If there are still hallucination pixels inside the circle, those hallucinations aren't throwing off the centroid significantly, so it's fine to ignore them. With our new set of pixels with hallucinations removed, we compute the new Cx and Cy.
 
-Pitch Identification
+***Pitch Identification***
+
 
 Smoothing and Classifying Pitch Types
 
