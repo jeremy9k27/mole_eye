@@ -34,3 +34,7 @@ We seek to represent the ball as a single coordinate in each frame. This is done
 Smoothing and Classifying Pitch Types
 
 - next steps. ML Classiieer
+
+
+future stuff
+what's causing the decaying accuracy? (like the fixating after a few pitches). is it the number of pitches? or time elapsed?
