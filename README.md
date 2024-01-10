@@ -15,9 +15,13 @@ Curveball:
 
 https://github.com/jeremy9k27/mole_eye/assets/118779230/3cbc3c86-eb40-4060-b2fe-a48529985c5c
 
-Mole-Eye is inspired by Hawk-Eye, the company that the MLB works with for all computer vision and tracking data work. This includes their pitch classifier, in which they use 12 high speed cameras to observe the balls movement, velocity, spin rate, and spin axis. 
 
-Mole_Eye is a python code that uses the CV2 library. The computer continuously recieves frames from the iPhone camera and runs algorithms as it recieves the frames. The breakdown of the algorithm (full code can be found in main_code branch) is as follows:
+**Abstract**
+Mole-Eye is inspired by Hawk-Eye, the company that the MLB works with for all computer vision and tracking data work. This includes their pitch classifier, in which they use 12 high speed cameras to observe the balls movement, velocity, spin rate, and spin axis. Mole_Eye is a python code that uses the CV2 library. The computer continuously recieves frames from the iPhone camera and runs algorithms as it recieves the frames.
+
+
+
+The detailed breakdown of the algorithm (full code can be found in main_code branch) is as follows:
  
 
 ***Ball Detection:***
@@ -29,7 +33,7 @@ One of the biggest obstacles is that even a still video is noisy. That is, even 
 We seek to represent the ball as a single coordinate in each frame. This is done by finding the weighted centroid of the x coordinates and y coordinates of all the pixels that are within the green range, with the weights being the amount of "greeness" of each pixel. In many of the frames, these pixels include hallucinations that make the resulting Cx and Cy inaccurate. Fortunately, there are more almost always more signal pixels than hallucination pixels, which means innaccurate centroids are still close to the actual ball, allowing us to easily remove the hallucinations. We utilize CV2's circle function for this: we create a circle of radius 10 pixels around the centroid, and any points not inside the circle are removed from the set of pixels inside the green range. This removes almost all hallucinations. If there are still hallucination pixels inside the circle, those hallucinations aren't throwing off the centroid significantly, so it's fine to ignore them. With our new set of pixels with hallucinations removed, we compute the new Cx and Cy.
 
 ***Pitch Identification***
-
+As the program is continuously running and recieving frames, it needs to be able to know that a pitch is being thrown without user input. We make use of the hallucinations to accomplish this. When no pitch is in frame, the centroid is entirely determined by the hallucinations. Due to their random nature, this means the centroid jumps widely from frame to frame. However, when the ball is in frame, the centroid follows the ball and does not move widely from one frame to the next. This stability is our trigger that a pitch is being thrown. 
 
 Smoothing and Classifying Pitch Types
 
