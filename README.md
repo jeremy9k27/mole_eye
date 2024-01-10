@@ -37,10 +37,15 @@ As the program is continuously running and recieving frames, it needs to be able
 
 When the pitch is over, our centroid array - containing the coordinates of the ball's centroid in each frame - is moved along into the next part of the algorithm. However, we observe through testing that sometimes the algorithm thinks a pitch has started even when the ball isn't in frame. This is again due to the randomness of the hallucinations, as sometimes through chance, three hallucinations in a row happen to be near each other. We implement two new methods to prevent this. We first improve the pre-pitch processes by making the pitch_started condition more strict by observing that the pitch will always start in the same rough location. In the camera setup from the example, the pitch always starts in the top right quadrant. Thus, we add to the condition that all three points are in that quadrant. We can also improve post-pitch processing by setting a minimum length of the centroid array. If the array has length less than say 10, then it wasn't actually a pitch, and the algorithm goes back to looking for a pitch.
 
-**Smoothing and Classifying Pitch Types**
+***Dislaying and Classifying Pitch Types***
 
-- next steps. ML Classiieer
+With the centroid coordinates we are now ready for the exciting outputs of the algorithm: displaying the pitch and classifying it. If we were to display the centroid coordinates as is, we would observe that the path of the ball is rather jagged. Knowing that the actual flight of the ball is smooth (and that our centroid coordinates contain both signal and noise), we apply a simple smoothing algorithm to the coordinates - replacing each coordinate with the average of itself and its neighboring coordinates. The new processed centroid array is then displayed using cv2.imshow to overlay it over the frame. 
+
+We also used the processed centroid array to classify the pitch. Through observation, the last parts of the pitch is what is most informative about the pitch type. Because we can only see movement and not velocity our spin, we will have use four pitch types to choose from based on the slope of the last part of each pitch. Fastballs have minimal movement, curveballs move down, sweeper sliders move glove side, and sinkers move arm side. The exact slope thresholds for each pitch are bit tricky due to the way we are using 2d coodinates to represent a 3d situation. Still, the model seems to classify the pitches accurately, although a larger dataset is needed for more rigourous testing.
+
+***Future Developments***
+Another benefit of a larger dataset is it opens the possibility of more advanced classificaiton techniques. One promsiing possibility is k-means clusters. A bigger modification (but one that slightly goes against the low-scale nature of the project) is to use two cameras. Two cameras would allow us to represent each centroid not just as Cx and Cy, but also with Cz, giving us a dimension of depth that we currently do not have. This would also open a new realm of possibilities because velocity could also be measured. (For example, a pitch moving downward could be split into curveballs and gyro sliders.)
 
 
-future stuff
-what's causing the decaying accuracy? (like the fixating after a few pitches). is it the number of pitches? or time elapsed?
+
+Note to author - what's causing the decaying accuracy? (like the fixating after a few pitches). is it the number of pitches? or time elapsed?
