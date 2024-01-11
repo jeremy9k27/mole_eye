@@ -18,7 +18,7 @@ https://github.com/jeremy9k27/mole_eye/assets/118779230/3cbc3c86-eb40-4060-b2fe-
 
 **Abstract**
 
-Mole-Eye is inspired by Hawk-Eye, the company that the MLB works with for all computer vision and tracking data work. This includes their pitch classifier, in which they use 12 high speed cameras to observe the balls movement, velocity, spin rate, and spin axis. Mole_Eye is a python code that uses the CV2 library. The computer continuously recieves frames from the iPhone camera and runs algorithms as it recieves the frames.
+Mole-Eye is inspired by Hawk-Eye, the company that the MLB works with for all computer vision and tracking data work. This includes their pitch classifier, for which they use 12 high speed cameras to observe the balls movement, velocity, spin rate, and spin axis. Mole_Eye, a low-scale, accessible version of this, is a Python code that uses the CV2 library to continuously recieve frames from an iPhone camera and run algorithms as it recieves the frames. Like Hawkeye, it is able to detect, display, and classify pitches in real time. The code detects the ball based on the pixels in each frame that are within a certain color range. A 
 
 
 
