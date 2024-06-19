@@ -1,92 +1,10 @@
 import cv2   #include opencv library functions in python
 import numpy as np
 
-def avg_array(original_array):
-    
-    new_array = np.zeros_like(original_array, dtype=float)
-   
-    # Calculate averages based on specified conditions
-    for m in [0,1]:
-        for i in range(original_array.shape[1]):
-            if i == 0:
-                # For the first element, average with the next element
-                new_array[m][i] = (original_array[m][i] + original_array[m][i + 1]) / 2
-            elif i == (original_array.shape[1]) - 1:
-                # For the last element, average with the previous element
-                new_array[m][i] = (original_array[m][i] + original_array[m][i - 1]) / 2
-            else:
-                # For elements in the middle, average with the previous, current, and next elements
-                new_array[m][i] = (original_array[m][i - 1] + original_array[m][i] + original_array[m][i + 1]) / 3
-
-    return new_array.astype(int)
-
-def classify(pitch):
-   
-    # i think the slope of the second half of the pitch is more informative of the pitch type
-    #pitch = pitch[: , 0:int(pitch.shape[1]/2)]
-    x = max(pitch[0]) - min(pitch[0])
-    y = max(pitch[1]) - min(pitch[1])
-    slope = y/x
-    if slope < 0.5:
-        type = "slider (sweeper)"
-    elif slope < 1.1:
-        type = "fastball"
-    elif False:
-        type = "slider (gyro)"
-    else:
-        type = "curveball"
-
-    return [type, np.str_(x), np.str_(y)]
-    
-
-def disp_pitch(pitch_array, original):
-    #print("successful")
-    #black = np.zeros((480,640))
-    onto = original
-    
-    for i in range(pitch_array.shape[1]):
-        center = (pitch_array[0][i].astype(int), pitch_array[1][i].astype(int))
-        #print(center)
-        cv2.circle(onto, center, 5, 255, -1)
-
-    text = classify(pitch_array)
-    
-    while True:
-        cv2.putText(onto, text[0], (10, 460), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-        cv2.putText(onto, "horiz", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-        cv2.putText(onto, text[1], (90, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-        cv2.putText(onto, "vert", (10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-        cv2.putText(onto, text[2], (90, 430), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-
-    
-        cv2.imshow("pitch map", onto)
-
-        if cv2.waitKey(1) & 0xFF == ord('p'):
-                original = original
-                break
-        
-
-def process(pitch_array):
-    print("before")
-    print(pitch_array)
-    i = 0
-    limit = (pitch_array.shape[1])
-    while i < limit -1:
-        if ((abs(pitch_array[0][i+1] - pitch_array[0][i])) + (abs(pitch_array[1][i+1] - pitch_array[1][i])) < 60):
-            i += 1
-        else:
-            pitch_array = np.delete(pitch_array, i+1, axis=1)
-            limit += -1
-    i = 0
-
-    print("after")
-    pitch_array = avg_array(pitch_array)
-    print(pitch_array)
-    return pitch_array
-        
+from utils import disp_pitch, process        
         
 #Create an object to hold reference to camera video capturing
-camera = 'http://192.168.0.17:4747/video'
+camera = 'http://192.168.1.114:4747/video'
 #camera = 0
 
 vidcap = cv2.VideoCapture(camera)
@@ -193,7 +111,7 @@ if vidcap.isOpened():
                 '''
 
                 black_frame = np.zeros_like(color_mask)
-                cv2.circle(black_frame, (cX, cY), 40, 255, -1)
+                cv2.circle(black_frame, (cX, cY), 40, (255,255,255), -1)
                 frame_masked_gray[black_frame == 0] = 0
                 #cv2.imshow("black", black_frame)
 
