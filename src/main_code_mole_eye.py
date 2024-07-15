@@ -4,8 +4,8 @@ import numpy as np
 from utils import disp_pitch, process        
         
 #Create an object to hold reference to camera video capturing
-camera = 'http://192.168.1.114:4747/video'
-#camera = 0
+#camera = 'http://192.168.1.114:4747/video'
+camera = 0
 
 vidcap = cv2.VideoCapture(camera)
 
@@ -61,9 +61,7 @@ if vidcap.isOpened():
             ''''''
             if i == 0:
                 hallucinations = np.zeros_like(color_mask)
-                print(frame.shape)
-                #num_rows = frame.shape[0]
-                #num_cols = frame.shape[1]
+                #print(frame.shape)
                 centroid_array = np.zeros((2,3))
                 start = False
                 stop = False
