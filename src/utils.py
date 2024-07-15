@@ -78,8 +78,6 @@ def disp_pitch(pitch_array, original):
         
 
 def process(pitch_array):
-    print("before")
-    print(pitch_array)
     i = 0
     limit = (pitch_array.shape[1])
     while i < limit -1:
@@ -90,9 +88,8 @@ def process(pitch_array):
             limit += -1
     i = 0
 
-    print("after")
     pitch_array = avg_array(pitch_array)
-    print(pitch_array)
+    #print(pitch_array)
     return pitch_array
 
 curveball1 = [[617, 610, 597, 586, 575, 565, 555, 546, 537, 529, 523, 518, 515, 511, 506, 503, 499, 496, 492, 489, 486, 484, 480, 475, 470, 466, 465, 465, 465, 465, 465, 465, 466, 467], [55, 59, 68, 76, 84, 91, 99, 108, 116, 123, 129, 134, 139, 144, 149, 152, 157, 162, 167, 169, 174, 179, 185, 191, 200, 207, 209, 210, 211, 213, 214, 216, 218, 220]]
@@ -120,6 +117,6 @@ def disp_pitch_test(pitch_array):
         if cv2.waitKey(1) & 0xFF == ord('p'):
                 break
 
-disp_pitch_test(avg_array(process(np.array(curveball1))))
+#disp_pitch_test(avg_array(process(np.array(curveball1))))
 #disp_pitch(avg_array(process(np.array(fastball1)))) 
 #disp_pitch(avg_array(process(np.array(sweeper1))))

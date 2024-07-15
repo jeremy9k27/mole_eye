@@ -4,8 +4,8 @@ import numpy as np
 from utils import disp_pitch, process        
         
 #Create an object to hold reference to camera video capturing
-#camera = 'http://192.168.1.114:4747/video'
-camera = 0
+camera = 'http://192.168.0.16:4747/video'
+#camera = 0
 
 vidcap = cv2.VideoCapture(camera)
 
@@ -162,8 +162,7 @@ if vidcap.isOpened():
                             
                             #do math and display
                             disp_pitch(centroid_array, onto1)
-                            
-                        
+                                                    
                         else:
                             print("pitch not detected")
 
