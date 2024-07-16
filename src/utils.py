@@ -3,13 +3,13 @@ import numpy as np
 
 
 def avg_array(original_array):
-    
     new_array = np.zeros_like(original_array, dtype=float)
    
     # Calculate averages based on specified conditions
     for m in [0,1]:
         for i in range(original_array.shape[1]):
             if i == 0:
+                print("check recieved len:", original_array.shape[1])
                 # For the first element, average with the next element
                 new_array[m][i] = (original_array[m][i] + original_array[m][i + 1]) / 2
             elif i == (original_array.shape[1]) - 1:

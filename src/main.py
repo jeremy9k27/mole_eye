@@ -5,7 +5,7 @@ from utils import disp_pitch, process
         
 #Create an object to hold reference to camera video capturing
 camera = 'http://192.168.0.16:4747/video'
-#camera = 0
+camera1 = 'http://192.168.0.27:4747/video'
 
 vidcap = cv2.VideoCapture(camera)
 
@@ -153,11 +153,9 @@ if vidcap.isOpened():
                         centroid_array = centroid_array[: , 1:]
                     
                     if stop:
-                        if centroid_array.shape[1] > 10:
-                            print("pitch detected")
-                            #print(centroid_array[:, :-1])
-
-                            #process centroid array
+                        if centroid_array.shape[1] > 10 and process(centroid_array).shape[1] > 10:
+                            
+                            print("pitch detected giving len:", centroid_array.shape[1])
                             centroid_array = process(centroid_array)
                             
                             #do math and display
