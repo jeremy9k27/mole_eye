@@ -1,6 +1,7 @@
 import cv2
+
 camera0 = 'http://192.168.0.16:4747/video'
-camera1 = 'http://192.168.0.27:4747/video'
+camera1 = 'http://192.168.0.28:4747/video'
 
 # Open the first camera
 cap1 = cv2.VideoCapture(camera0)
