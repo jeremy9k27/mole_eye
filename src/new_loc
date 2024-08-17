@@ -1,13 +1,15 @@
-import cv2   #include opencv library functions in python
+import cv2   
 import numpy as np
+import time
 
-from utils import disp_pitch, process, avg_array        
+from utils import disp_pitch, process, avg_array
         
 #Create an object to hold reference to camera video capturing
-camera = 'http://192.168.0.28:4747/video'
-#camera1 = 'http://192.168.0.27:4747/video'
+camera = 'http://192.168.0.9:4747/video'
+camera1 = 'http://192.168.0.19:4747/video'
+#camera2 = 2
 
-vidcap = cv2.VideoCapture(camera)
+vidcap = cv2.VideoCapture(camera1)
 
 #check if connection with camera is successfully
 if vidcap.isOpened():
@@ -18,7 +20,7 @@ if vidcap.isOpened():
     brightness = 15 # Brightness control 
     # Define 'blue' range in HSV colorspace
     # center is 50?
-    lower = np.array([27,20,60])
+    lower = np.array([27,20,70])
     upper = np.array([83,255,255])
 
     # mu = np.array([235, 212, 50])
@@ -37,32 +39,22 @@ if vidcap.isOpened():
     if ret:
         # continue to display window until 'q' is pressed
         while(True):
-            ret, frame = vidcap.read()  #capture a frame from live video
-                     
-            
-            # Adjust frame
+            ret, frame = vidcap.read()      
             frame = cv2.addWeighted(frame, contrast, frame, 0, brightness)  
-            
-            # Find blue   
+            timestamp = (time.time() % 100) * (10 **8)
+
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             color_mask = cv2.inRange(hsv, lower, upper)
 
-            # Bitwise-AND mask and original image
             frame_masked = cv2.bitwise_and(hsv,hsv, mask= color_mask)
-            #cv2.imshow("frame masked", cv2.cvtColor(frame_masked, cv2.COLOR_HSV2BGR))
-
-            # frame_masked = cv2.cvtColor(frame_masked, cv2.COLOR_BGR2GRAY)
-            # print(frame_masked.mean())
             frame_masked_gray = (np.floor_divide(frame_masked[:, :, 1], 2)) + (np.floor_divide(frame_masked[:,:,2] ,2 ))
-            # print(frame_masked_gray.max())
 
             
             #find hallucinations   
             ''''''
             if i == 0:
                 hallucinations = np.zeros_like(color_mask)
-                #print(frame.shape)
-                centroid_array = np.zeros((2,3))
+                centroid_array = np.zeros((3,3))
                 start = False
                 stop = False
                 onto1 = frame.copy()
@@ -82,11 +74,8 @@ if vidcap.isOpened():
                 #hallucinations[hallucinations > 0] = 1
                 
                 print("initialized")
-                
-                #print(color_mask.shape)
-                i += 1  
 
-            #cv2.imshow("hallucinations", 255 * hallucinations.astype(np.uint8))
+                i += 1  
            
             else:
                 # calculate moments of binary image
@@ -119,21 +108,18 @@ if vidcap.isOpened():
                 if k < 3:
                     centroid_array[0][k] = cX
                     centroid_array[1][k] = cY
+                    centroid_array[2][k] = timestamp
                     k += 1
                     
-
-                
                     
-                start_con =  np.all(centroid_array[:, -3:] > 1)
-                #stop_con = (sum(centroid_array[:, -2] - centroid_array[:, -1]) < 1) and (sum(centroid_array[:, -3] - centroid_array[:, -2]) < 1)
-                stop_con = np.all(centroid_array[:, -4:] == 1)
-                new_col = np.array([[cX], [cY]])
+                start_con =  np.all(centroid_array[0:2, -3:] > 1)
+                stop_con = np.all(centroid_array[0:2, -4:] == 1)
+                new_col = np.array([[cX], [cY], [timestamp]])
                 centroid_array = np.hstack((centroid_array, new_col))
 
                 if not start:
                     if start_con:
                         start = True
-                        print("potential pitch detected")
                     else:
                         centroid_array = centroid_array[: , 1:]
 
@@ -141,17 +127,21 @@ if vidcap.isOpened():
                     if stop_con:   
                         if process(centroid_array).shape[1] > 10:
                             
-                            print("pitch detected giving len:", centroid_array.shape[1])
-                            centroid_array = avg_array(process(centroid_array))
+                            #print("pitch detected giving len:", centroid_array.shape[1])
+                            centroid_array = process(centroid_array)
+                            quills = (centroid_array[2,-1] - centroid_array[2,0]) // (10**5) / 1000
+                            starting_angle = np.mean(centroid_array[3, 1:4])
+                            ending_angle = np.mean(centroid_array[3, -5:-1])
+                            diff = ending_angle - starting_angle
+                            print(quills, starting_angle, ending_angle, diff)
                             
-                            #do math and display
                             disp_pitch(centroid_array, onto1)
                                                     
                         else:
                             print("pitch not detected")
 
 
-                        centroid_array = np.zeros((2,3))
+                        centroid_array = np.zeros((3,3))
                         start = False
                         stop = False
                         k = 0
@@ -161,11 +151,6 @@ if vidcap.isOpened():
                 cv2.imshow("Frame2", frame)
                 cv2.imshow("frame_masked_gray", frame_masked_gray)
                 #cv2.imshow("frame masked", cv2.cvtColor(frame_masked, cv2.COLOR_HSV2BGR))
-
-                # if np.any(color_mask == 255) == True:
-                #     print("detected")
-                # else:
-                #     print("none")
 
             #press 'q' to break out of the loop
             if cv2.waitKey(1) & 0xFF == ord('q'):

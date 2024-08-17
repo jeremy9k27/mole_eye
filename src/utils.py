@@ -1,9 +1,10 @@
 import cv2   #include opencv library functions in python
 import numpy as np
+from rf import classify_single
 
 
 def avg_array(original_array):
-    new_array = np.zeros_like(original_array, dtype=float)
+    new_array = original_array.copy()
    
     # Calculate averages based on specified conditions
     for m in [0,1]:
@@ -17,54 +18,30 @@ def avg_array(original_array):
 
     return new_array.astype(int)
 
+def classify(centroid_array):
+    quills = (centroid_array[2,-1] - centroid_array[2,0]) // (10**5) / 1000
+    starting_angle = np.mean(centroid_array[3, 1:4])
+    ending_angle = np.mean(centroid_array[3, -5:-1])
+    diff = ending_angle - starting_angle
+    
+    pitch_type = classify_single([[quills, starting_angle, ending_angle, diff]])
 
-def classify(pitch):
-   
-    pitch = pitch[: , 0:int(pitch.shape[1]/3)]
-    x = max(pitch[0]) - min(pitch[0])
-    y = max(pitch[1]) - min(pitch[1])
-    slope = y/x
+    return [str(quills), str(diff), str(pitch_type)]
 
-    if y > 50:
-        type = 'curveball'
-    elif y > 35:
-      
-        type = 'fastball'
-    else:
-        type = 'slider (sweeper)'
 
-    '''
-    if slope < 0.45:
-        type = "slider (sweeper)"
-    elif slope < 0.9:
-        type = "fastball"
-    elif False:
-        type = "slider (gyro)"
-    else:
-        type = "curveball"
-    '''
+def disp_pitch(pitch_array, original) -> None:
 
-    return [type, np.str_(x), np.str_(y)]
-
-def disp_pitch(pitch_array, original):
-    #print("successful")
-    #black = np.zeros((480,640))
     onto = original
     
     for i in range(pitch_array.shape[1]):
         center = (pitch_array[0][i].astype(int), pitch_array[1][i].astype(int))
-        #print(center)
         cv2.circle(onto, center, 5, (255,0,0), -1)
 
-    text = classify(pitch_array)
-    print(pitch_array)
+    outputs = classify(pitch_array)
     while True:
-        cv2.putText(onto, text[0], (10, 460), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-        cv2.putText(onto, "horiz", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-        cv2.putText(onto, text[1], (90, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-        cv2.putText(onto, "vert", (10, 430), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-        cv2.putText(onto, text[2], (90, 430), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
-
+        cv2.putText(onto, outputs[0], (10, 460), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 2)
+        cv2.putText(onto, outputs[1], (10, 430), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 2)
+        cv2.putText(onto, outputs[2], (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 2)
     
         cv2.imshow("pitch map", onto)
 
@@ -74,7 +51,7 @@ def disp_pitch(pitch_array, original):
         
 
 def process(pitch_array):
-    pitch_array = np.vstack((pitch_array[0, :][pitch_array[0, :] != 1], pitch_array[1, :][pitch_array[1, :] != 1]))
+    pitch_array = pitch_array[:,~((pitch_array[0,:] == 1) & (pitch_array[1,:] == 1))]
     i = 0
     limit = (pitch_array.shape[1])
     while i < limit -1:
@@ -84,14 +61,13 @@ def process(pitch_array):
             pitch_array = np.delete(pitch_array, i+1, axis=1)
             limit += -1
     i = 0
-    return avg_array(pitch_array)
+    return find_end(avg_array(pitch_array))
 
 curveball1 = [[617, 610, 597, 586, 575, 565, 555, 546, 537, 529, 523, 518, 515, 511, 506, 503, 499, 496, 492, 489, 486, 484, 480, 475, 470, 466, 465, 465, 465, 465, 465, 465, 466, 467], [55, 59, 68, 76, 84, 91, 99, 108, 116, 123, 129, 134, 139, 144, 149, 152, 157, 162, 167, 169, 174, 179, 185, 191, 200, 207, 209, 210, 211, 213, 214, 216, 218, 220]]
 fastball1 = [[611, 599, 578, 561, 547, 534, 525, 517, 510, 504, 499, 494, 490, 487, 484, 482, 477, 474, 472, 473, 471, 470, 470, 469, 469, 468], [153, 157,165,171,175,179,182,185,188,199,193,196,198,200,202,203,207,211,214,215,216,217,218,220,221,222]]
 sweeper1 = [[624,617,604,591,580,569,559,550,542,533,524,516,510,503,496,488,482,478,475,473], [167,168,171,174,177,180,183,186,189,193,197,201,204,208,213,218,223,226,229,231]]
 
 def disp_pitch_test(pitch_array):
-    #print("successful")
     black = np.zeros((480, 640, 3))
     
     for i in range(pitch_array.shape[1]):
@@ -112,6 +88,7 @@ def disp_pitch_test(pitch_array):
                 break
         
 def overlay(pitch_array_shorter, pitch_array_longer):
+    print(pitch_array_shorter)
     black = np.zeros((480, 640, 3))
     
     for i in range(pitch_array_longer.shape[1]):
@@ -130,10 +107,11 @@ def overlay(pitch_array_shorter, pitch_array_longer):
         
 def find_end(pitch_array):
     prev_direction = 0
+    angles = np.array([0])
     for i in range(pitch_array.shape[1]):
        
         if i>0:
-            movement = (pitch_array[:,i] - pitch_array[:,i-1]) * [1,-1]
+            movement = (pitch_array[:,i] - pitch_array[:,i-1]) * [1,-1,1]
             movement = np.where(movement == 0, 0.1, movement)
             
             slope = movement[1] / movement[0]
@@ -141,11 +119,13 @@ def find_end(pitch_array):
             if movement[0]<0:
                 direction = direction + (3.1415926)
             direction = direction % 6.2832
-            #print(direction * 180 /3.14159)
+            angles = np.append(angles, direction)
             if i>1:
                 if abs(direction - prev_direction) > 3.14159/8:
-                    return pitch_array[:,:i+1]
+                    return np.vstack((pitch_array[:,:i], angles[:i]))
             prev_direction = direction
+
+    pitch_array = np.vstack((pitch_array, angles))
     return pitch_array
 
 
@@ -205,10 +185,12 @@ bad = np.array([[549, 476, 446, 417, 389, 372, 355,   1, 332, 321, 315, 305, 301
   .pq
 '''
 
-overlay(find_end(avg_array(process(np.array( [[413, 404, 395, 387, 380, 373, 367, 361, 356, 351, 346, 343, 339, 336, 332, 329, 327, 324, 322, 319, 316, 314, 312, 310, 308, 306, 305, 303, 301, 299, 297, 295, 295, 295, 295, 296, 297, 298, 300, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 309, 310, 311, 312, 313, 314, 314, 315, 315, 316, 316, 317, 318, 319, 320, 320, 321, 322, 323, 324, 325, 326, 327, 328, 328, 329]
- ,[4, 16, 29, 41, 53, 63, 73, 82, 90, 98, 106, 113, 120, 126, 133, 139, 145, 151, 157, 162, 168, 173, 178, 183, 188, 194, 199, 204, 209, 213, 218, 222, 226, 228, 229, 229, 229, 229, 229, 229, 230, 231, 233, 235, 237, 239, 241, 244, 247, 251, 256, 263, 267, 270, 269, 269, 270, 270, 270, 269, 268, 268, 269, 268, 268, 267, 267, 267, 267, 266, 265, 264, 265, 266, 267]]
+'''
+overlay(find_end(avg_array(np.array( [[427, 418, 409, 401, 394, 388, 383, 379, 375, 372, 369, 366, 363, 361, 360, 359, 358, 357, 356, 355, 354, 354, 353, 352, 351, 350, 349, 348, 348, 348, 348, 348, 348, 348, 349, 349, 350, 351, 352, 353, 353, 354, 356, 357, 357, 358, 359, 360, 361]
+ ,[3, 15, 28, 42, 54, 65, 75, 85, 93, 101, 108, 115, 121, 128, 134, 139, 145, 150, 155, 159, 164, 168, 173, 177, 182, 187, 191, 196, 200, 204, 208, 212, 216, 218, 220, 219, 219, 218, 218, 217, 216, 216, 216, 216, 217, 219, 220, 222, 222]]
 
-)))), avg_array(process(np.array( [[413, 404, 395, 387, 380, 373, 367, 361, 356, 351, 346, 343, 339, 336, 332, 329, 327, 324, 322, 319, 316, 314, 312, 310, 308, 306, 305, 303, 301, 299, 297, 295, 295, 295, 295, 296, 297, 298, 300, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 309, 310, 311, 312, 313, 314, 314, 315, 315, 316, 316, 317, 318, 319, 320, 320, 321, 322, 323, 324, 325, 326, 327, 328, 328, 329]
- ,[4, 16, 29, 41, 53, 63, 73, 82, 90, 98, 106, 113, 120, 126, 133, 139, 145, 151, 157, 162, 168, 173, 178, 183, 188, 194, 199, 204, 209, 213, 218, 222, 226, 228, 229, 229, 229, 229, 229, 229, 230, 231, 233, 235, 237, 239, 241, 244, 247, 251, 256, 263, 267, 270, 269, 269, 270, 270, 270, 269, 268, 268, 269, 268, 268, 267, 267, 267, 267, 266, 265, 264, 265, 266, 267]]
+))), avg_array(np.array([[427, 418, 409, 401, 394, 388, 383, 379, 375, 372, 369, 366, 363, 361, 360, 359, 358, 357, 356, 355, 354, 354, 353, 352, 351, 350, 349, 348, 348, 348, 348, 348, 348, 348, 349, 349, 350, 351, 352, 353, 353, 354, 356, 357, 357, 358, 359, 360, 361]
+ ,[3, 15, 28, 42, 54, 65, 75, 85, 93, 101, 108, 115, 121, 128, 134, 139, 145, 150, 155, 159, 164, 168, 173, 177, 182, 187, 191, 196, 200, 204, 208, 212, 216, 218, 220, 219, 219, 218, 218, 217, 216, 216, 216, 216, 217, 219, 220, 222, 222]]
 
-))))
+)))
+'''
