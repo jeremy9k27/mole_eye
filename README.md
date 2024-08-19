@@ -4,12 +4,12 @@ Examples below
 
 A green ping pong ball was used in the examples so that it could safely be thrown indoors.
 
-3D reconstruction, Streamlit front-end (wait ~5 seconds after the pitch is thrown, demo with no front-end farther has less delay due to lower latency):
+1) 3D reconstruction, Streamlit front-end (wait ~5 seconds after the pitch is thrown, demo with no front-end farther has less delay due to lower latency):
 
 https://github.com/user-attachments/assets/515dd0fe-9dfd-4d5e-b38b-4eccdca7aeb0
 
 
-3D reconstruction, no front-end:
+2) 3D reconstruction, no front-end:
 
 https://github.com/user-attachments/assets/324a139e-9c28-4e09-9073-323e625e143e
 
