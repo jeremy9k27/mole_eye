@@ -9,23 +9,14 @@ A green ping pong ball was used in the examples so that it could safely be throw
 
 3D reconstruction, Streamlit front-end (demos with no front-end farther below are faster due to lower latency):
 
+https://github.com/user-attachments/assets/515dd0fe-9dfd-4d5e-b38b-4eccdca7aeb0
 
 
+3D reconstruction, no front-end:
 
-3D reconstruction, no front-end
-
-
-Uploading mole_eye v3 demo - Made with Clipchamp.mp4…
+https://github.com/user-attachments/assets/324a139e-9c28-4e09-9073-323e625e143e
 
 
-Fastball:
-
-https://github.com/jeremy9k27/mole_eye/assets/118779230/efcd5f73-02e2-4b61-af31-e4280a34cb5a
-
-
-Curveball:
-
-https://github.com/jeremy9k27/mole_eye/assets/118779230/3cbc3c86-eb40-4060-b2fe-a48529985c5c
 
 
 ***Abstract***
@@ -65,4 +56,11 @@ Another benefit of a larger dataset is it opens the possibility of more advanced
 
 
 
-Note to author - what's causing the decaying accuracy? (like the fixating after a few pitches). is it the number of pitches? or time elapsed?
+Fastball:
+
+https://github.com/jeremy9k27/mole_eye/assets/118779230/efcd5f73-02e2-4b61-af31-e4280a34cb5a
+
+
+Curveball:
+
+https://github.com/jeremy9k27/mole_eye/assets/118779230/3cbc3c86-eb40-4060-b2fe-a48529985c5c
