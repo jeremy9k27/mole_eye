@@ -1,13 +1,10 @@
-# mole_eye
+# mole_eye - Real-Time No-Cost Baseball Pitch Classifier
 
-Real-Time No-Cost Baseball Pitch Classifier
-
-
-Examples below.
+Examples below
 
 A green ping pong ball was used in the examples so that it could safely be thrown indoors.
 
-3D reconstruction, Streamlit front-end (demos with no front-end farther below are faster due to lower latency):
+3D reconstruction, Streamlit front-end (wait ~5 seconds after the pitch is thrown, demo with no front-end farther has less delay due to lower latency):
 
 https://github.com/user-attachments/assets/515dd0fe-9dfd-4d5e-b38b-4eccdca7aeb0
 
