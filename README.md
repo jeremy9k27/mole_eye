@@ -7,9 +7,16 @@ Examples below.
 
 A green ping pong ball was used in the examples so that it could safely be thrown indoors.
 
-New - 3D reconstruction
+3D reconstruction, Streamlit front-end (demos with no front-end farther below are faster due to lower latency):
 
-https://github.com/user-attachments/assets/875abc53-26a0-4c9a-b352-40eef1d155d3
+
+
+
+3D reconstruction, no front-end
+
+
+Uploading mole_eye v3 demo - Made with Clipchamp.mp4…
+
 
 Fastball:
 
