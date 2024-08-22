@@ -1,4 +1,6 @@
-# mole_eye - Real-Time No-Cost Baseball Pitch Classifier
+# mole_eye - Real-Time No-Cost Baseball Pitch Detector
+
+Industry standard equipment costs thousands of dollars. Can we get similar results with just an iPhone camera?
 
 Examples below
 
