@@ -4,8 +4,6 @@ Industry standard equipment costs thousands of dollars. Can we get similar resul
 
 Examples below
 
-A green ping pong ball was used in the examples so that it could safely be thrown indoors.
-
 Demo 1) 3D reconstruction, Streamlit front-end (wait ~10 seconds after the pitch is thrown to see 2d image + 3D reconstruction, demo 2 with no front-end has less delay due to lower latency):
 
 https://github.com/user-attachments/assets/515dd0fe-9dfd-4d5e-b38b-4eccdca7aeb0
