@@ -4,10 +4,13 @@ Industry standard equipment for live pitch analysis costs thousands of dollars. 
 
 Examples below
 
-Demo) 3D reconstruction:
+Demo 1) (no front-end):
 
 https://github.com/user-attachments/assets/324a139e-9c28-4e09-9073-323e625e143e
 
+Demo 2) (streamlit front-end, a bit slower)
+
+https://github.com/user-attachments/assets/515dd0fe-9dfd-4d5e-b38b-4eccdca7aeb0
 
 ***Abstract***
 
@@ -56,8 +59,4 @@ Curveball:
 https://github.com/jeremy9k27/mole_eye/assets/118779230/3cbc3c86-eb40-4060-b2fe-a48529985c5c
 
 
-Extra demo: 
 
-3D reconstruction, Streamlit front-end (wait ~10 seconds after the pitch is thrown to see 2d image + 3D reconstruction, demo 2 with no front-end has less delay due to lower latency):
-
-https://github.com/user-attachments/assets/515dd0fe-9dfd-4d5e-b38b-4eccdca7aeb0
