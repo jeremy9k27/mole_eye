@@ -10,8 +10,7 @@ https://github.com/user-attachments/assets/324a139e-9c28-4e09-9073-323e625e143e
 
 Demo 2) (React front-end, a bit slower)
 
-
-https://github.com/user-attachments/assets/d929946c-6f9a-4518-92b6-1799123de2cb
+https://github.com/user-attachments/assets/ca6b705c-a5de-44a6-929b-d6c01906feeb
 
 
 
