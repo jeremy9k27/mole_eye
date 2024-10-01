@@ -1,6 +1,6 @@
 # mole_eye - Real-Time No-Cost Baseball Pitch Detector
 
-Industry standard equipment for live pitch analysis costs thousands of dollars. Can we get similar results with just an iPhone camera?
+Industry standard equipment for live pitch analysis costs thousands of dollars (like Rapsodo). Can we get similar results with just an iPhone camera?
 
 Examples below
 
