@@ -8,9 +8,12 @@ Demo 1) (no front-end):
 
 https://github.com/user-attachments/assets/324a139e-9c28-4e09-9073-323e625e143e
 
-Demo 2) (streamlit front-end, a bit slower)
+Demo 2) (React front-end, a bit slower)
 
-https://github.com/user-attachments/assets/515dd0fe-9dfd-4d5e-b38b-4eccdca7aeb0
+
+https://github.com/user-attachments/assets/d929946c-6f9a-4518-92b6-1799123de2cb
+
+
 
 ***Abstract***
 
@@ -43,11 +46,12 @@ With the centroid coordinates we are now ready for the exciting outputs of the a
 
 We also used the processed centroid array to classify the pitch. Through observation, the last parts of the pitch is what is most informative about the pitch type. Because we can only see movement and not velocity our spin, we will have use four pitch types to choose from based on the slope of the last part of each pitch. Fastballs have minimal movement, curveballs move down, sweeper sliders move glove side, and sinkers move arm side. The exact slope thresholds for each pitch are bit tricky due to the way we are using 2d coodinates to represent a 3d situation. Still, the model seems to classify the pitches accurately, although a larger dataset is needed for more rigourous testing.
 
-***Future Developments***
-
-Another benefit of a larger dataset is it opens the possibility of more advanced classificaiton techniques. One promsiing possibility is k-means clusters. A bigger modification (but one that slightly goes against the low-scale nature of the project) is to use two cameras. Two cameras would allow us to represent each centroid not just as Cx and Cy, but also with Cz, giving us a dimension of depth that we currently do not have. This would also open a new realm of possibilities because velocity could also be measured. (For example, a pitch moving downward could be split into curveballs and gyro sliders.)
 
 
+
+Streamlit: 
+
+https://github.com/user-attachments/assets/515dd0fe-9dfd-4d5e-b38b-4eccdca7aeb0
 
 Fastball:
 
