@@ -4,7 +4,7 @@ Industry standard equipment for live pitch analysis costs thousands of dollars (
 
 Examples below
 
-Demo 1) (no front-end):
+Demo 1) (no front-end, look for the small green ball in left screen):
 
 https://github.com/user-attachments/assets/324a139e-9c28-4e09-9073-323e625e143e
 
